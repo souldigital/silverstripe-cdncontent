@@ -21,7 +21,7 @@ class CDNFile extends DataExtension {
 	public $contentService;
 	
 	public function onBeforeWrite() {
-		if ($this->owner instanceof Image && $this->owner->ClassName == 'Image') {
+		if ($this->owner instanceof Image && $this->owner->ClassName == 'Image' && $this->owner->exists()) {
 			$this->owner->ClassName = 'CdnImage';
 		}
 	}
@@ -100,6 +100,7 @@ class CDNFile extends DataExtension {
 	
 	public function onAfterUpload() {
 		$this->uploadToContentService();
+		$this->owner->write();
 	}
 
 	public function downloadFromContentService() {
