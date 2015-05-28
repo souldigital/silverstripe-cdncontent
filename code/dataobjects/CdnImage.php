@@ -29,5 +29,7 @@ class CdnImage extends Image {
 			$cached->ParentID = $this->ParentID;
 			return $cached;
 		}
+
+		return call_user_func_array('parent::getFormattedImage', $args);
 	}
 }

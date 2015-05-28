@@ -55,6 +55,10 @@ class CdnControllerExtension extends Extension {
 				$verify = true;
 			}
 			
+			$mtime = @filemtime(Director::baseFolder().'/'.$assetPath);
+			$timedAssetPath = $mtime . '/' . $assetPath;
+			
+			//$reader = $this->contentService->findReaderFor($store, $timedAssetPath);
 			$reader = $this->contentService->findReaderFor($store, $assetPath);
 			if ($reader && (!$verify || $reader->exists())) {
 				return $reader->getURL();
@@ -71,12 +75,14 @@ class CdnControllerExtension extends Extension {
 						return $assetPath;
 					}
 					// upload all references too
-					return $this->contentDelivery->storeThemeFile($current->Theme, $fullPath, false, true);
+					return $this->contentDelivery->storeThemeFile($store, $fullPath, false, true);
 				}
 
 				// otherwise just upload
 				$writer = $this->getWriter();
 				// otherwise, we need to write the file
+				
+				//$writer->write(Director::baseFolder().'/'.$assetPath, $timedAssetPath);
 				$writer->write(Director::baseFolder().'/'.$assetPath, $assetPath);
 
 				return $writer->getReader()->getURL();

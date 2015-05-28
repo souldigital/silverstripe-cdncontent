@@ -101,7 +101,10 @@ class VersionedFileExtension extends \DataExtension {
 			if (!file_exists($fullPath) && $asset) {
 				// delete the remote
 				$writer = $this->service->getWriterFor($asset, 'FilePointer', $store);
-				$writer->delete();
+				if ($writer) {
+					$writer->delete();
+				}
+				
 				$asset->delete();
 				continue;
 			}
@@ -116,13 +119,16 @@ class VersionedFileExtension extends \DataExtension {
 			}
 
 			$writer = $this->service->getWriterFor($asset, 'FilePointer', $store);
-			$writer->write(fopen($fullPath, 'r'), $path);
-			
-			if ($asset->ID <= 0) {
-				$asset->FilePointer = $writer->getContentId();
-				$asset->write();
+			//$mtime = @filemtime($path);
+			if ($writer) {
+				//$writer->write(fopen($fullPath, 'r'), $mtime . '/' . $path);
+				$writer->write(fopen($fullPath, 'r'), $path);
+
+				if ($asset->ID <= 0) {
+					$asset->FilePointer = $writer->getContentId();
+					$asset->write();
+				}
 			}
 		}
-
 	}
 }

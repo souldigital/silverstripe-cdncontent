@@ -34,6 +34,8 @@ class ImageCachedExtension extends \DataExtension {
 
 			$writer = $this->service->getWriterFor($asset, 'FilePointer', $storeIn);
 			if ($writer) {
+				// $mtime = @filemtime($cached->getFullPath());
+				// $writer->write(fopen($cached->getFullPath(), 'r'), $mtime . '/' . $filename);
 				$writer->write(fopen($cached->getFullPath(), 'r'), $filename);
 
 				$asset->FilePointer = $writer->getContentId();

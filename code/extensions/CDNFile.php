@@ -109,9 +109,12 @@ class CDNFile extends DataExtension {
 
 		if ($pointer->exists()) {
             $dir = substr($this->owner->getFullPath(), 0, (strlen($this->owner->Name) * -1));
-            if(!is_dir($dir))
-                mkdir($dir, 0777, true);
-			file_put_contents($this->owner->getFullPath(), $pointer->getReader()->read());
+			$reader = $pointer->getReader();
+			if ($reader) {
+				if(!is_dir($dir))
+					mkdir($dir, 0777, true);
+				file_put_contents($this->owner->getFullPath(), $pointer->getReader()->read());
+			}
 		}
 	}
 
@@ -119,18 +122,22 @@ class CDNFile extends DataExtension {
 	 * Upload this content asset to the configured CDN
 	 */
 	public function uploadToContentService() {
-		if ($this->owner->ParentID && $this->owner->Parent()->getCDNStore() && !($this->owner instanceof Folder)) {
+		$file = $this->owner;
+		if ($file->ParentID && $file->Parent()->getCDNStore() && !($file instanceof Folder)) {
 			/** @var \File $file */
-			$file = $this->owner;
-
-			$path = $this->owner->getFullPath();
+			
+			$path = $file->getFullPath();
 			if (strlen($path) && is_file($path) && file_exists($path)) {
 				$writer = $this->writer();
-				// $writer->write($this->owner->getFullPath(), $this->owner->getFullPath());
-				$writer->write(fopen($file->getFullPath(), 'r'), $file->getFilename());
+				//$mtime = @filemtime($path);
+				if ($writer) {
+					//$writer->write(fopen($file->getFullPath(), 'r'), $mtime . '/' . $file->getFilename());
+					$writer->write(fopen($file->getFullPath(), 'r'), $file->getFilename());
 
-				// writer should now have an id
-				$file->CDNFile = $writer->getContentId();
+					// writer should now have an id
+					$file->CDNFile = $writer->getContentId();
+					$file->write();
+				}
 			}
 		}
 	}
